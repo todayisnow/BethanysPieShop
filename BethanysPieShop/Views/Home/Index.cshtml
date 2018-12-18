@@ -10,7 +10,8 @@
 
     @foreach (var pie in Model.PiesOfTheWeek)
     {
-        @Html.Partial("PieOfTheWeekSummary", pie)
+        
+        <partial name="PieOfTheWeekSummary" model="pie" />
     }
 
 </div>
