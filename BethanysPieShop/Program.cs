@@ -22,11 +22,16 @@ namespace BethanysPieShop
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-
+                var env = services.GetRequiredService<IHostingEnvironment>();
                 try
                 {
+                    if (env.IsDevelopment())
+                    {
+                        //DbInitializer.Initialize(services);
+                        DbInitializer.Seed(services);
+
+                    }
                     // Requires using RazorPagesMovie.Models;
-                    DbInitializer.Seed(services);
                 }
                 catch (Exception ex)
                 {

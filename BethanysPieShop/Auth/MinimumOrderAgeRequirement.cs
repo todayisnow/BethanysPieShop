@@ -16,8 +16,10 @@ namespace BethanysPieShop.Auth
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, MinimumOrderAgeRequirement requirement)
         {
+            
             if (!context.User.HasClaim(c => c.Type == ClaimTypes.DateOfBirth))
             {
+
                 return Task.CompletedTask;
             }
 

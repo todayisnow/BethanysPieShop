@@ -27,6 +27,7 @@ namespace BethanysPieShop.Controllers
 
         [HttpPost]
         [Authorize]
+        [Authorize(Policy ="Xx")]
         public IActionResult Checkout(Order order)
         {
             var items = _shoppingCart.GetShoppingCartItems();

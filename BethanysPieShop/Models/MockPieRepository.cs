@@ -29,5 +29,15 @@ namespace BethanysPieShop.Models
         {
             throw new System.NotImplementedException();
         }
+
+        public void CreatePie(Pie pie)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdatePie(Pie pie)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

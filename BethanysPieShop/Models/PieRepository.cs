@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BethanysPieShop.Models
 {
@@ -34,6 +32,18 @@ namespace BethanysPieShop.Models
         public Pie GetPieById(int pieId)
         {
             return _appDbContext.Pies.FirstOrDefault(p => p.PieId == pieId);
+        }
+
+        public void UpdatePie(Pie pie)
+        {
+            _appDbContext.Pies.Update(pie);
+            _appDbContext.SaveChanges();
+        }
+
+        public void CreatePie(Pie pie)
+        {
+            _appDbContext.Pies.Add(pie);
+            _appDbContext.SaveChanges();
         }
     }
 }

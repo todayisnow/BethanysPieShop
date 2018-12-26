@@ -1,13 +1,10 @@
-﻿using BethanysPieShop.Auth;
+﻿using System.Security.Claims;
 using BethanysPieShop.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using BethanysPieShop.Auth;
 
 namespace BethanysPieShop.Controllers
 {
@@ -47,6 +44,7 @@ namespace BethanysPieShop.Controllers
                 var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, false, false);
                 if (result.Succeeded)
                 {
+             
                     if (string.IsNullOrEmpty(loginViewModel.ReturnUrl))
                         return RedirectToAction("Index", "Home");
 
@@ -58,7 +56,7 @@ namespace BethanysPieShop.Controllers
             return View(loginViewModel);
         }
 
-        [AllowAnonymous]
+
         public IActionResult Register()
         {
             return View();
@@ -66,28 +64,18 @@ namespace BethanysPieShop.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [AllowAnonymous]
         public async Task<IActionResult> Register(LoginViewModel loginViewModel)
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser() { UserName = loginViewModel.UserName ,Email=loginViewModel.Email};
+                var user = new ApplicationUser() { UserName = loginViewModel.UserName };
                 var result = await _userManager.CreateAsync(user, loginViewModel.Password);
 
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Index", "Home");
                 }
-                else
-                {
-                    foreach (var item in result.Errors)
-                    {
-                        ModelState.AddModelError("", item.Description);
-
-                    }
-                }
             }
-         
             return View(loginViewModel);
         }
 
@@ -95,8 +83,66 @@ namespace BethanysPieShop.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            
             return RedirectToAction("Index", "Home");
+        }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public IActionResult GoogleLogin(string returnUrl = null)
+        {
+            var redirectUrl = Url.Action("GoogleLoginCallback", "Account", new { ReturnUrl = returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(ExternalLoginServiceConstants.GoogleProvider, redirectUrl);
+            return Challenge(properties, ExternalLoginServiceConstants.GoogleProvider);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleLoginCallback(string returnUrl = null, string serviceError = null)
+        {
+            if (serviceError != null)
+            {
+                ModelState.AddModelError(string.Empty, $"Error from external provider: {serviceError}");
+                return View(nameof(Login));
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
+            if (result.Succeeded)
+            {
+                if (returnUrl == null)
+                    return RedirectToAction("index", "home");
+
+                return Redirect(returnUrl);
+            }
+
+            var user = new ApplicationUser
+            {
+                Email = info.Principal.FindFirst(ClaimTypes.Email).Value,
+                UserName = info.Principal.FindFirst(ClaimTypes.Email).Value
+            };
+
+            var identityResult = await _userManager.CreateAsync(user);
+
+            if (!identityResult.Succeeded) return AccessDenied();
+
+            identityResult = await _userManager.AddLoginAsync(user, info);
+
+            if (!identityResult.Succeeded) return AccessDenied();
+
+            await _signInManager.SignInAsync(user, false);
+
+            if (returnUrl == null)
+                return RedirectToAction("index", "home");
+
+            return Redirect(returnUrl);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BethanysPieShop.Auth;
 using BethanysPieShop.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -51,9 +52,20 @@ namespace BethanysPieShop
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<ShoppingCart>(sp => ShoppingCart.GetCart(sp));
             services.AddTransient<IOrderRepository, OrderRepository>();
-
+            services.AddScoped<IAuthorizationHandler, MinimumOrderAgeAppUserRequirementHandler>();
+            services.AddScoped<IAuthorizationHandler, XxRequirementHandler>();
+            services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, AppClaimsPrincipalFactory>();
             services.AddMvc();
-
+            //Claims-based
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdministratorOnly", policy => policy.RequireRole("Administrator"));
+                options.AddPolicy("DeletePie", policy => policy.RequireClaim("Delete Pie", "Delete Pie"));
+                options.AddPolicy("AddPie", policy => policy.RequireClaim("Add Pie", "Add Pie"));
+                options.AddPolicy("MinimumOrderAge", policy => policy.Requirements.Add(new MinimumOrderAgeAppUserRequirement(18)));
+                options.AddPolicy("Xx", policy => policy.Requirements.Add(new XxRequirement(18)));
+            });
+            
             services.AddMemoryCache();
             services.AddSession();
         }
