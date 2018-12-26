@@ -71,7 +71,7 @@ namespace BethanysPieShop.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser() { UserName = loginViewModel.UserName };
+                var user = new ApplicationUser() { UserName = loginViewModel.UserName ,Email=loginViewModel.Email};
                 var result = await _userManager.CreateAsync(user, loginViewModel.Password);
 
                 if (result.Succeeded)

@@ -17,5 +17,7 @@ namespace BethanysPieShop.ViewModels
         public string Password { get; set; }
 
         public string ReturnUrl { get; set; }
+        [DataType(DataType.EmailAddress)]
+        public string Email { get; set; }
     }
 }
