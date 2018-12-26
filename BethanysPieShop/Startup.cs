@@ -45,8 +45,7 @@ namespace BethanysPieShop
                 .AddDefaultTokenProviders();
             
 
-            // If you want to tweak Identity cookies, they're no longer part of IdentityOptions.
-            services.ConfigureApplicationCookie(options => options.LoginPath = "/Account/LogIn");
+            
             services.AddTransient<IPieRepository, PieRepository>();
             services.AddTransient<ICategoryRepository, CategoryRepository>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
