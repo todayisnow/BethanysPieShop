@@ -44,7 +44,6 @@ namespace BethanysPieShop.Controllers
                 var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, false, false);
                 if (result.Succeeded)
                 {
-             
                     if (string.IsNullOrEmpty(loginViewModel.ReturnUrl))
                         return RedirectToAction("Index", "Home");
 
@@ -90,13 +89,29 @@ namespace BethanysPieShop.Controllers
         {
             return View();
         }
+        [Authorize]
+        public async Task<IActionResult> UserInfo()
+        {
 
+            ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+            var userInfo = new UserInfoViewModel()
+            {
+                ApplicationUser = applicationUser,
+                Claims = User.Claims
+                // Claims = applicationUser.Claims.Select(c=>new Claim(c.ClaimType ,c.ClaimValue));
+
+            };
+
+            return View(userInfo);
+        }
         [AllowAnonymous]
         public IActionResult GoogleLogin(string returnUrl = null)
         {
             var redirectUrl = Url.Action("GoogleLoginCallback", "Account", new { ReturnUrl = returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(ExternalLoginServiceConstants.GoogleProvider, redirectUrl);
-            return Challenge(properties, ExternalLoginServiceConstants.GoogleProvider);
+            //return Challenge(properties, ExternalLoginServiceConstants.GoogleProvider);
+            return new ChallengeResult(ExternalLoginServiceConstants.GoogleProvider, properties);
+            
         }
 
         [AllowAnonymous]

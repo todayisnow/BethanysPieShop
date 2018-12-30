@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using BethanysPieShop.Auth;
 using BethanysPieShop.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -55,7 +58,31 @@ namespace BethanysPieShop
             services.AddScoped<IAuthorizationHandler, MinimumOrderAgeAppUserRequirementHandler>();
             services.AddScoped<IAuthorizationHandler, XxRequirementHandler>();
             services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, AppClaimsPrincipalFactory>();
+
+         
+            
             services.AddMvc();
+            services.AddAuthentication().AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                googleOptions.UserInformationEndpoint = "https://openidconnect.googleapis.com/v1/userinfo";
+                googleOptions.ClaimActions.Clear();
+                googleOptions.ClaimActions.MapJsonKey(ClaimTypes.Name, "email");
+                googleOptions.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "given_Name");
+                googleOptions.ClaimActions.MapJsonKey(ClaimTypes.Surname, "family_Name");
+                googleOptions.ClaimActions.MapJsonKey("urn:google:profile", "profile");
+                googleOptions.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+                googleOptions.ClaimActions.MapJsonKey("urn:google:image", "picture");
+                googleOptions.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
+                googleOptions.Events.OnRemoteFailure = ctx =>
+                {
+                    ctx.Response.Redirect("/error?FailureMessage=" + UrlEncoder.Default.Encode(ctx.Failure.Message));
+                    ctx.HandleResponse();
+                    return Task.FromResult(0);
+                };
+            }
+            );
             //Claims-based
             services.AddAuthorization(options =>
             {
@@ -81,7 +108,7 @@ namespace BethanysPieShop
             app.UseStaticFiles();
             app.UseSession();
             app.UseAuthentication();
-
+           
             //app.UseMvcWithDefaultRoute();
 
             app.UseMvc(routes =>
