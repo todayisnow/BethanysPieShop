@@ -58,9 +58,10 @@ namespace BethanysPieShop
             services.AddScoped<IAuthorizationHandler, MinimumOrderAgeAppUserRequirementHandler>();
             services.AddScoped<IAuthorizationHandler, XxRequirementHandler>();
             services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, AppClaimsPrincipalFactory>();
+            services.AddTransient<IPieReviewRepository, PieReviewRepository>();
 
-         
-            
+
+
             services.AddMvc();
             services.AddAuthentication().AddGoogle(googleOptions =>
             {

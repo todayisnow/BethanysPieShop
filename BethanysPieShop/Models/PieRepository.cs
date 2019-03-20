@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace BethanysPieShop.Models
 {
-    public class PieRepository: IPieRepository
+    public class PieRepository : IPieRepository
     {
         private readonly AppDbContext _appDbContext;
 
@@ -31,7 +31,7 @@ namespace BethanysPieShop.Models
 
         public Pie GetPieById(int pieId)
         {
-            return _appDbContext.Pies.FirstOrDefault(p => p.PieId == pieId);
+            return _appDbContext.Pies.Include(p => p.PieReviews).FirstOrDefault(p => p.PieId == pieId);
         }
 
         public void UpdatePie(Pie pie)
