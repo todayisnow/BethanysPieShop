@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,8 +62,13 @@ namespace BethanysPieShop
             services.AddTransient<IPieReviewRepository, PieReviewRepository>();
 
 
+            //specify options for the anti forgery here
+            services.AddAntiforgery(opts => { opts.RequireSsl = true; });
 
-            services.AddMvc();
+            //anti forgery as global filter
+            services.AddMvc(options =>
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+            // services.AddMvc();
             services.AddAuthentication().AddGoogle(googleOptions =>
             {
                 googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];

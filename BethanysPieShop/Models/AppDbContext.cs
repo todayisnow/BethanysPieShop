@@ -21,6 +21,7 @@ namespace BethanysPieShop.Models
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<PieReview> PieReviews { get; set; }
+        public DbSet<PieGiftOrder> PieGiftOrders { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
