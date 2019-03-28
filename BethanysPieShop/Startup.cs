@@ -25,7 +25,7 @@ namespace BethanysPieShop
         {
             Configuration = configuration;
         }
-
+        public Microsoft.AspNetCore.Http.CookieBuilder Cookie { get; set; }
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -49,7 +49,7 @@ namespace BethanysPieShop
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
             
-
+            
             
             services.AddTransient<IPieRepository, PieRepository>();
             services.AddTransient<ICategoryRepository, CategoryRepository>();
@@ -61,9 +61,9 @@ namespace BethanysPieShop
             services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, AppClaimsPrincipalFactory>();
             services.AddTransient<IPieReviewRepository, PieReviewRepository>();
 
-
-            //specify options for the anti forgery here
-            services.AddAntiforgery(opts => { opts.RequireSsl = true; });
+      
+        //specify options for the anti forgery here
+       // services.AddAntiforgery(opts => { opts.RequireSsl = true; });
 
             //anti forgery as global filter
             services.AddMvc(options =>

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using BethanysPieShop.Models;
 using BethanysPieShop.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,7 @@ namespace BethanysPieShop.Controllers
 {
     [Authorize(Roles = "Administrators")]
     [Authorize(Policy = "DeletePie")]
-    public class PieManagementController: Controller
+    public class PieManagementController : Controller
     {
         private readonly IPieRepository _pieRepository;
         private readonly ICategoryRepository _categoryRepository;
@@ -69,10 +70,10 @@ namespace BethanysPieShop.Controllers
         }
 
         [HttpPost]
+        //public IActionResult EditPie([Bind("Pie")] PieEditViewModel pieEditViewModel)
         public IActionResult EditPie(PieEditViewModel pieEditViewModel)
         {
             pieEditViewModel.Pie.CategoryId = pieEditViewModel.CategoryId;
-
             if (ModelState.IsValid)
             {
                 _pieRepository.UpdatePie(pieEditViewModel.Pie);
@@ -86,6 +87,43 @@ namespace BethanysPieShop.Controllers
         {
             return View();
         }
+
+        public IActionResult QuickEdit()
+        {
+            var pieNames = _pieRepository.Pies.Select(p => p.Name).ToList();
+            return View(pieNames);
+        }
+
+        [HttpPost]
+        public IActionResult QuickEdit(List<string> pieNames)
+        {
+            //Do awesome things with the pie names here
+            return View(pieNames);
+        }
+
+        public IActionResult BulkEditPies()
+        {
+            var pieNames = _pieRepository.Pies.ToList();
+            return View(pieNames);
+        }
+
+        [HttpPost]
+        public IActionResult BulkEditPies(List<Pie> pies)
+        {
+            //Do awesome things with the pie here
+            return View(pies);
+        }
+    }
+
+    public class x
+    {
+        public void t (int i , bool v=true)
+        {
+
+        }
+    }
+    public class C : x
+    {
 
     }
 }
